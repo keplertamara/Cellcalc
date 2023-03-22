@@ -2,12 +2,25 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="hu.sandysoft.cellcalc" />
       </profile>
+      <profile name="Annotation profile for hu.sandysoft.cellcalc" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar" />
+        </processorPath>
+        <module name="Cellcalc" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="hu.sandysoft.cellcalc" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,4 +1,4 @@
-package org.example;
+package hu.sandysoft.cellcalc;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

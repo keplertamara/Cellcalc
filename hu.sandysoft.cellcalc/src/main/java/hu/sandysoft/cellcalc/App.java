@@ -1,4 +1,4 @@
-package org.example;
+package hu.sandysoft.cellcalc;
 
 public class App {
 
