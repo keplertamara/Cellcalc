@@ -1,8 +1,12 @@
 package hu.sandysoft.cellcalc;
 
+import hu.sandysoft.cellcalc.info.CellCount;
+import hu.sandysoft.cellcalc.simulation.CellCulture;
+import hu.sandysoft.cellcalc.usercommunication.InputClass;
+
 public class App {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello World!");
+        InputClass inputClass = new InputClass();
     }
 }
