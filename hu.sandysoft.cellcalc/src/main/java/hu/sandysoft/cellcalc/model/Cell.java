@@ -23,7 +23,8 @@ public class Cell {
     public void decreaseToxinLevel(int i) {
         toxinLevel = max(0, toxinLevel-i);
     }
-
+// ne tudjon toxint leadni, ha toxint adunk a médiumhoz, ez osztódáskor feleződik
+    //a sejt saját toxinjai más dolog
     public void stepCellCycle() {
         if(cellCycle < 8) {
             cellCycle++;
@@ -54,24 +55,24 @@ public class Cell {
             toxinLevel = 0;
         }
         else {
-            cellSize = cellCycle/2;
-            toxinLevel = toxinLevel/2;
+            cellSize = cellCycle/2; // teljesen ketté osztódik, azonos utódsejtek!!
+            toxinLevel = toxinLevel/2; //1,5 nap alatt duplázódnak, akár napi 2 osztódás
         }
-        cellCycle = 1;
+        cellCycle = 0;
     }
 
 
     public CellCycle calculateState() {
-        if(maximumToxinLevelToDivide < toxinLevel) {
+        if(maximumToxinLevelToDivide * 1.4 < toxinLevel) {
             return CellCycle.DEAD;
-        }
+        } //legyenek g0 fázisban is
         if(cellCycle == 0) {
             return CellCycle.G0;
         }
         if(cellCycle < 2) {
-            return CellCycle.G1;
+            return CellCycle.G1; //minél magasabb a toxin szint, annál hosszabb legyen
         }
-        if(cellCycle < 4) {
+        if(cellCycle < 3) {
             return CellCycle.S;
         }
         if(cellCycle < 6) {

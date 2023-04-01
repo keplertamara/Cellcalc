@@ -1,6 +1,7 @@
 package hu.sandysoft.cellcalc;
 
 import hu.sandysoft.cellcalc.info.MeasuredParameters;
+import hu.sandysoft.cellcalc.model.Cell;
 import hu.sandysoft.cellcalc.model.Location;
 
 import java.util.Random;
@@ -31,6 +32,10 @@ public class RandomValues {
         return 0.8 + 0.4 *  random.nextDouble();
     }
 
+    public int generateStartCellNumber() {
+        return 80 + random.nextInt(40);
+    }
+
     public Location generateCloseLocation(Location l) {
         double angle = random.nextDouble() * Math.PI * 2;
         double distance = random.nextDouble() * 7;
@@ -42,5 +47,15 @@ public class RandomValues {
         newY = Math.min(200, Math.max(0, newY));
 
         return new Location(newX, newY);
+    }
+
+    public Cell generateRandomCell() {
+        return new Cell(
+                generateCellSize(),
+                generateToxinLevel(),
+                generateCellCycle(),
+                generateMaximumToxinLevel(),
+                generateRandomLocation()
+        );
     }
 }

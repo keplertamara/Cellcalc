@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Toxin {
-   //private ToxinType toxinType;
-   private Location location;
-
-
+public class AddedToxin {
+    private double ZEA;
+    private double IZEA;
 }

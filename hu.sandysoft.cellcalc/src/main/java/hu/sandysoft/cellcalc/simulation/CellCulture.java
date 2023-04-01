@@ -23,49 +23,62 @@ public class CellCulture {
         for(int i = 0; i < Math.floor(1 + daysOfSimulation * 1.6 * 7); i++) {
             stepOneCycle();
         }
+        outputToUser();
+    }
+
+    private void setUpCellCulture() {
+        CellCount.numberOfWell = MeasuredParameters.isFromEmbryo ? 1 : 50;
+        addCells();
+        changeMedium();
+    }
+    private void stepOneCycle() {
+        if(numberOfCyclesPassed % 22 == 0) {
+            changeMedium();
+            if(numberOfCyclesPassed % 132 == 0) {
+                separateCells();
+            }
+        }
+        getNextStateOfCells();
+        saveCellNumber();
+    }
+    private void outputToUser() {
         System.out.println("Simulation is over");
         DiagramDrawer diagramDrawer = new DiagramDrawer();
         diagramDrawer.drawBarChart();
     }
 
-    private void setUpCellCulture() {
-        CellCount.numberOfWell = MeasuredParameters.isFromEmbryo ? 1 : 50;
-        for(int i =0; i<100; i++) {
-            generateRandomCell();
+    private void addCells() {
+        int n = randomValues.generateStartCellNumber();
+        for(int i = 0; i < n; i++) {
+            cellList.add(randomValues.generateRandomCell());
         }
-        changeMedium();
-    }
-    private void generateRandomCell() {
-        cellList.add(new Cell(
-                randomValues.generateCellSize(),
-                randomValues.generateToxinLevel(),
-                randomValues.generateCellCycle(),
-                randomValues.generateMaximumToxinLevel(),
-                randomValues.generateRandomLocation()
-        ));
     }
     private void changeMedium() {
         nutrientList.clear();
-        /** number of cell cycles in 3 days * cell cycle stages * max cell count in the petri*/
-        for(int i = 0; i < 5*7*200; i++) {
+        for(int i = 0; i <  7*1500;i++) {
             generateNutrient();
         }
-        removeDeadCells();
         System.out.println("Medium Changed");
     }
-    private void stepOneCycle() {
-        if(numberOfCyclesPassed % 33 == 0) {
-            changeMedium();
-        }
-        if(numberOfCyclesPassed % 78 == 0) {
-            changeMedium();
-            separateCells();
-        }
-        getNextStateOfCells();
-        numberOfCyclesPassed++;
+    private void separateCells() {
+        CellCount.numberOfWell *= 2;
+        cellList.subList(0, cellList.size()/2).clear();
+        removeDeadCells();
 
-        saveAliveCellNumber();
+        System.out.println("We got separated");
     }
+    private void getNextStateOfCells() {
+        cellList.forEach(cell -> vitalProcesses(cell));
+        makeChildCells();
+        numberOfCyclesPassed++;
+    }
+    private void saveCellNumber() {
+        CellCount.sumOfCellsInOneWell.add(cellList.size());
+        CellCount.sumOfAllCellsPerCellCycles.add(CellCount.numberOfWell * cellList.size());
+        System.out.println(numberOfCyclesPassed + ". cycle: ");
+        System.out.println(cellList.size());
+    }
+
     private void generateNutrient() {
         nutrientList.add(new Nutrient(
                          randomValues.generateRandomLocation(),
@@ -75,42 +88,19 @@ public class CellCulture {
     private void removeDeadCells() {
         cellList.removeIf(c -> c.calculateState() == CellCycle.DEAD);
     }
-    private void getNextStateOfCells() {
-        cellList.forEach(this::divideIfPossible);
-        makeChildCells();
-        something();
-    }
-
-    private void saveAliveCellNumber() {
-        int count =  countAliveCells();
-        CellCount.sumOfCellsInOneWell.add(count);
-        CellCount.sumOfAllCellsPerCellCycles.add(CellCount.numberOfWell * count);
-        System.out.println(numberOfCyclesPassed + ". cycle: ");
-        System.out.println(CellCount.numberOfWell * count);
-    }
-
-    private int countAliveCells() {
-        return (int) cellList.stream()
-                .filter(c->CellCycle.DEAD != c.calculateState())
-                .count();
-    }
-
-    private void separateCells() {
-        CellCount.numberOfWell *= 2;
-        cellList.subList(0, cellList.size()/2).clear();
-        System.out.println("We got separated");
-    }
-    private void divideIfPossible(Cell cell) {
-        if(cell.canDivide()) {
-            cell.divide();
-            dividingCells.add(cell);
+    private void vitalProcesses(Cell cell) {
+        if(cell.calculateState() != CellCycle.DEAD) {
+            eat(cell);
+            toxinProcess(cell);
+            cell.stepCellCycle();
+            divideIfPossible(cell);
         }
     }
     private void makeChildCells() {
         while(!dividingCells.isEmpty()) {
             cellList.add( new Cell(
-                    1,
-                    0,
+                    dividingCells.get(0).getCellSize() / 2,
+                    dividingCells.get(0).getToxinLevel() / 2,
                     0,
                     randomValues.generateMaximumToxinLevel(),
                     randomValues.generateCloseLocation(dividingCells.get(0).getLocation())
@@ -118,35 +108,43 @@ public class CellCulture {
             dividingCells.remove(0);
         }
     }
-    private void something() {
-        cellList.forEach(cell -> {
-            eat(cell);
-            toxinProcess(cell);
-            cell.stepCellCycle();
-        });
+
+    private void divideIfPossible(Cell cell) {
+        if(cell.canDivide()) {
+            dividingCells.add(cell);
+            cell.divide();
+        }
     }
+
     private void eat(Cell cell) {
-        Nutrient food = findFirstNutrient(cell);
+        Nutrient food = findNutrient(cell);
         cell.feeding(food.getValue());
         nutrientList.removeIf(n -> n == food);
     }
     private void toxinProcess(Cell cell) {
-        if(getToxinAmountAroundCell(cell) > 0) {
+        Toxin toxin = findToxin(cell);
+        if(toxin.getLocation().getX() != -1) {
             cell.increaseToxinLevel(1);
         }
         else {
             cell.decreaseToxinLevel(1);
         }
         toxinList.add(new Toxin(randomValues.generateCloseLocation(cell.getLocation())));
+        toxinList.removeIf(t -> t == toxin);
     }
-    private int getToxinAmountAroundCell(Cell cell) {
-        return (int) toxinList.stream()
-                              .filter(t-> t.getLocation().isClose(cell.getLocation()))
-                              .count();
+
+    private Toxin findToxin(Cell cell) {
+        if(isToxic(cell)) {
+            return toxinList.parallelStream()
+                            .filter(t -> t.getLocation().isClose(cell.getLocation()))
+                            .findFirst()
+                            .get();
+        }
+        return new Toxin(new Location(-1,-1));
     }
-    private Nutrient findFirstNutrient(Cell cell) {
-        if(cellCanEat(cell)) {
-            return nutrientList.stream()
+    private Nutrient findNutrient(Cell cell) {
+        if(canEat(cell)) {
+            return nutrientList.parallelStream()
                     .filter(n -> n.getLocation().isClose(cell.getLocation()))
                     .findFirst()
                     .get();
@@ -154,8 +152,13 @@ public class CellCulture {
         return new Nutrient(new Location(0,0), 0);
     }
 
-    private boolean cellCanEat(Cell cell) {
-        return nutrientList.stream()
+    private boolean isToxic(Cell cell) {
+        return toxinList.parallelStream()
+                .anyMatch(t -> t.getLocation().isClose(cell.getLocation()));
+    }
+
+    private boolean canEat(Cell cell) {
+        return nutrientList.parallelStream()
                 .anyMatch(n -> n.getLocation().isClose(cell.getLocation()));
     }
 }
