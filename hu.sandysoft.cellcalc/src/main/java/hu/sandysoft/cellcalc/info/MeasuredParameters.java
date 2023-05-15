@@ -1,5 +1,6 @@
 package hu.sandysoft.cellcalc.info;
 
+import hu.sandysoft.cellcalc.model.EcoToxin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +19,5 @@ public class MeasuredParameters {
     public static double maximumCellsIzeToDivide = -1;
     public static boolean resetWhenDivide = false;
     public static boolean isFromEmbryo = false;
+    public static EcoToxin ecoToxin = new EcoToxin(0,0);
 }

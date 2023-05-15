@@ -13,8 +13,8 @@ public class Location {
     public void move() {
         Random rand = new Random();
 
-        x += rand.nextInt(21) - 10;
-        y += rand.nextInt(21) - 10;
+        x += rand.nextInt(10) - 5;
+        y += rand.nextInt(10) - 5;
 
         x = Math.min(200, Math.max(0, x));
         y = Math.min(200, Math.max(0, y));

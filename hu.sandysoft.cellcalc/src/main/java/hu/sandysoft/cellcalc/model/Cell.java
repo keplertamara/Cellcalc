@@ -4,16 +4,18 @@ package hu.sandysoft.cellcalc.model;
 import hu.sandysoft.cellcalc.info.MeasuredParameters;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import static java.lang.Math.max;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Cell {
     private double cellSize;
     private int toxinLevel;
     private int cellCycle;
-    private final int maximumToxinLevelToDivide;
+    private int maximumToxinLevelToDivide;
     private Location location;
 
     public void increaseToxinLevel(int i) {
@@ -30,7 +32,7 @@ public class Cell {
             cellCycle++;
         }
         else {
-            cellCycle = 1;
+            cellCycle = 0;
         }
     }
 
@@ -55,29 +57,33 @@ public class Cell {
             toxinLevel = 0;
         }
         else {
-            cellSize = cellCycle/2; // teljesen ketté osztódik, azonos utódsejtek!!
+            cellSize = cellSize/2; // teljesen ketté osztódik, azonos utódsejtek!!
             toxinLevel = toxinLevel/2; //1,5 nap alatt duplázódnak, akár napi 2 osztódás
         }
         cellCycle = 0;
     }
 
 
-    public CellCycle calculateState() {
+    public CellCycle calculateState() { // 20 % ot the time they are in G0
         if(maximumToxinLevelToDivide * 1.4 < toxinLevel) {
             return CellCycle.DEAD;
         } //legyenek g0 fázisban is
-        if(cellCycle == 0) {
+        if(cellCycle < 2) { // gray 0,1
             return CellCycle.G0;
         }
-        if(cellCycle < 2) {
+        if(cellCycle < 5) { //red 2,3,4,
             return CellCycle.G1; //minél magasabb a toxin szint, annál hosszabb legyen
         }
-        if(cellCycle < 3) {
+        if(cellCycle < 6) { // orange
             return CellCycle.S;
         }
-        if(cellCycle < 6) {
+        if(cellCycle < 7) { // green
             return CellCycle.G2;
         }
-        return CellCycle.M;
+        return CellCycle.M; //green
+    }
+
+    public void move() {
+        location.move();
     }
 }

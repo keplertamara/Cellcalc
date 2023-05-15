@@ -9,13 +9,13 @@ import java.util.Random;
 public class RandomValues {
     private Random random = new Random();
     public double generateCellSize() {
-        return 1 + MeasuredParameters.maximumCellsIzeToDivide * random.nextDouble();
+        return 1 + (MeasuredParameters.maximumCellsIzeToDivide * random.nextDouble())/2;
     }
     public int generateToxinLevel() {
         if(MeasuredParameters.isFromEmbryo) {
             return 0;
         }
-        return MeasuredParameters.maximumToxinLevelToDivide * random.nextInt() / 2;
+        return (int) Math.floor((MeasuredParameters.maximumToxinLevelToDivide * random.nextDouble()));
     }
     public int generateCellCycle() {
         return random.nextInt(7);
@@ -29,7 +29,7 @@ public class RandomValues {
         return location;
     }
     public double generateValue() {
-        return 0.8 + 0.4 *  random.nextDouble();
+        return (0.8 + 0.4 *  random.nextDouble()) / 5;
     }
 
     public int generateStartCellNumber() {
@@ -38,7 +38,7 @@ public class RandomValues {
 
     public Location generateCloseLocation(Location l) {
         double angle = random.nextDouble() * Math.PI * 2;
-        double distance = random.nextDouble() * 7;
+        double distance = random.nextDouble() * 4;
 
         int newX = (int) Math.round(l.getX() + distance * Math.cos(angle));
         int newY = (int) Math.round(l.getY() + distance * Math.sin(angle));

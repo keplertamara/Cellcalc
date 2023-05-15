@@ -1,5 +1,7 @@
 package hu.sandysoft.cellcalc.info;
 
+import hu.sandysoft.cellcalc.model.Cell;
+
 import java.util.ArrayList;
 import java.util.List;
 /** The program calculates only with one well at a time,
@@ -9,6 +11,7 @@ public class CellCount {
     public static List<Integer> sumOfAllCellsPerCellCycles = new ArrayList<>();
     public static List<Integer> sumOfCellsInOneWell = new ArrayList<>();
     public static int numberOfSimulationDays;
+    public static List<List<Cell>> petriHistory = new ArrayList<>();
 
     public void addActualCellSum(int numberOfCellsInWell) {
         sumOfCellsInOneWell.add(numberOfCellsInWell);
